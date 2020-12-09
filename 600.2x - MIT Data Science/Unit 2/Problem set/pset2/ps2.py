@@ -85,9 +85,7 @@ class RectangularRoom(object):
         """
         self.width = width
         self.height = height
-        self.tiles = [(x, y) for x in range(1, self.width +1) for y in range(1, self.height +1)]
-        self.dirty_tiles = self.tiles[:]
-        self.clean_tiles = []
+        self.tiles = {(x, y):"dirty" for x in range(self.width) for y in range(self.height)}
 
     def cleanTileAtPosition(self, pos):
         """
@@ -97,15 +95,8 @@ class RectangularRoom(object):
 
         pos: a Position object
         """
-        for tile_num in range(len(self.dirty_tiles)):
-            if pos.getX() <= self.dirty_tiles[tile_num][0]:
-                if pos.getY() <= self.dirty_tiles[tile_num][1]:
-                    self.clean_tiles.append(self.dirty_tiles.pop(tile_num))
-                    break
-        # on_tile = (math.ceil(pos.getX()), math.ceil(pos.getY()))
-        # if on_tile in self.dirty_tiles:
-        #     self.dirty_tiles.remove(on_tile)
-        #     self.clean_tiles.append(on_tile)
+        on_tile = (math.floor(pos.getX()), math.floor(pos.getY()))
+        self.tiles[on_tile] = "clean"
 
     def isTileCleaned(self, m, n):
         """
@@ -117,7 +108,7 @@ class RectangularRoom(object):
         n: an integer
         returns: True if (m, n) is cleaned, False otherwise
         """
-        return (m, n) in self.clean_tiles
+        return self.tiles[(m, n)] == "clean"
     
     def getNumTiles(self):
         """
@@ -133,7 +124,7 @@ class RectangularRoom(object):
 
         returns: an integer
         """
-        return len(self.clean_tiles)
+        return sum([i == "clean" for i in self.tiles.values()])
 
     def getRandomPosition(self):
         """
@@ -289,7 +280,7 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
 
 
 # Uncomment this line to see how much your simulation takes on average
-print(runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot))
+print(runSimulation(2, 1.0, 10, 10, 0.75, 2, StandardRobot))
 
 
 # === Problem 5
